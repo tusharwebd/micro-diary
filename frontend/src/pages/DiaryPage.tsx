@@ -8,10 +8,10 @@ function DiaryPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col w-screen h-screen">  {/* Full width and height */}
       {/* Navigation Bar */}
-      <nav className="bg-primary text-primary-foreground p-4">
-        <div className="container mx-auto flex justify-between items-center">
+      <nav className="bg-primary text-primary-foreground p-4 w-full">  {/* Ensure the nav spans full width */}
+        <div className="flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               <MenuIcon className="h-6 w-6" />
