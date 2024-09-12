@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { UserIcon, SearchIcon, MenuIcon } from "lucide-react";
+import httpClient from "../httpClient";
+import { Link } from "react-router-dom";
 
 // Function to generate a list of dates for the past 7 days
 const generatePastWeekDates = () => {
@@ -20,7 +22,43 @@ const generatePastWeekDates = () => {
 function DiaryPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(generatePastWeekDates()[0]); // Default to today
+  const [content, setContent] = useState<string>("");
+  const [loading, setLoading] = useState(false); // Add a loading state
+
   const dates = generatePastWeekDates();
+  const saveEntry = async () => {
+    console.log(content);
+    const response = await httpClient.post("//localhost:5000/save_entry", {
+      date: selectedDate,
+      content,
+    });
+    console.log(response.data);
+  };
+
+  const getEntry = async () => {
+    try {
+      setLoading(true); // Set loading state to true before fetching
+      const response = await httpClient.post("//localhost:5000/get_entry", {
+        date: selectedDate,
+      });
+      console.log(response.data);
+      setContent(response.data.content || ""); // Set the content if data is available
+      setLoading(false); // Turn off loading
+    } catch (error) {
+      console.error("Error fetching entry:", error);
+      setContent(""); // If there's an error, set content to an empty string
+      setLoading(false);
+    }
+  };
+  // Fetch the entry whenever the selected date changes
+  useEffect(() => {
+    getEntry();
+  }, [selectedDate]);
+
+  const logoutUser = async () => {
+    const response = await httpClient.post("//localhost:5000/logout");
+    console.log(response);
+  };
 
   return (
     <div className="flex flex-col w-screen h-screen">
@@ -54,9 +92,11 @@ function DiaryPage() {
                   className="pl-10 w-full md:w-auto"
                 />
               </div>
-              <Button variant="secondary">
-                <UserIcon className="mr-2 h-4 w-4" /> Sign In
-              </Button>
+              <Link to="/">
+                <Button variant="secondary" onClick={logoutUser}>
+                  <UserIcon className="mr-2 h-4 w-4" /> Logout
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
@@ -67,7 +107,7 @@ function DiaryPage() {
         {/* Left Pane */}
         <div className="w-64 bg-muted p-4 overflow-y-auto hidden md:block">
           <div className="flex justify-center">
-            <Button>Save</Button>
+            <Button onClick={saveEntry}>Save</Button>
           </div>
           <br />
           <Separator />
@@ -95,12 +135,18 @@ function DiaryPage() {
 
         {/* Textarea */}
         <div className="flex-grow p-4 overflow-y-auto">
-          <Textarea
-            className="w-full h-full resize-none"
-            placeholder={`Start typing your entry for ${new Date(
-              selectedDate
-            ).toLocaleDateString()}`}
-          />
+          {loading ? (
+            <p>Loading entry...</p>
+          ) : (
+            <Textarea
+              className="w-full h-full resize-none"
+              value={content} // Set the value of the textarea to the fetched content
+              placeholder={`Start typing your entry for ${new Date(
+                selectedDate
+              ).toLocaleDateString()}`}
+              onChange={(e) => setContent(e.target.value)}
+            />
+          )}
         </div>
       </div>
     </div>

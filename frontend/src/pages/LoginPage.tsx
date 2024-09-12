@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import httpClient from "../httpClient";
 
 function LoginPage() {
@@ -24,6 +25,7 @@ function LoginPage() {
     });
     console.log(resp.data);
   };
+
   return (
     <div className="flex flex-row w-screen items-center justify-center bg-background">
       <Card className="w-full max-w-md">
@@ -57,9 +59,11 @@ function LoginPage() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button className="w-full" onClick={() => logInUser()}>
-            Sign in
-          </Button>
+          <Link to="/diary">
+            <Button className="w-full" onClick={() => logInUser()}>
+              Sign in
+            </Button>
+          </Link>
         </CardFooter>
       </Card>
     </div>
