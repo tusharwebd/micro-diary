@@ -3,7 +3,7 @@ from flask_bcrypt import Bcrypt
 from flask_cors import CORS
 from flask_session import Session
 from config import ApplicationConfig
-from models import db, User
+from models import db, User, DiaryEntry
 
 app = Flask(__name__)
 app.config.from_object(ApplicationConfig)
@@ -68,6 +68,59 @@ def login_user():
         "id": user.id,
         "email": user.email
     })
+
+@app.route("/save_entry", methods=["POST"])
+def save_diary_entry():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
+
+    data = request.json
+    date = data.get("date")
+    content = data.get("content")
+
+    user = User.query.filter_by(id=user_id).first()
+
+    if not date or not content:
+        return jsonify({"error": "Date and content are required!"}), 400
+
+    new_entry = DiaryEntry(user_id=user.id, date=date, content=content)
+    db.session.add(new_entry)
+    db.session.commit()
+
+    return jsonify({"message": "Diary entry saved successfully!"}), 201
+
+@app.route("/get_entry", methods=["POST"])
+def get_diary_entry():
+    user_id = session.get("user_id")
+
+    if not user_id:
+        return jsonify({
+            "error": "Unauthorized"
+        }), 401
+
+    data = request.json
+    date = data.get("date")
+
+    if not date:
+        return jsonify({"error": "Date and content are required!"}), 400
+
+    diary_entry = DiaryEntry.query.filter_by(user_id=user_id, date=date).first()
+
+    print(diary_entry)
+    return jsonify({
+        "content": diary_entry.content
+    }), 201
+
+@app.route("/logout", methods=["POST"])
+def logout_user():
+    session.pop("user_id")
+    return jsonify({
+        "message": "logged out!"
+    }), 201
 
 if __name__ == "__main__":
     app.run(debug=True)
