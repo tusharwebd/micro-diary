@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { UserIcon, SearchIcon, MenuIcon } from "lucide-react";
 import httpClient from "../httpClient";
 import { Link } from "react-router-dom";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Function to generate a list of dates for the past 7 days
 const generatePastWeekDates = () => {
@@ -136,7 +137,12 @@ function DiaryPage() {
         {/* Textarea */}
         <div className="flex-grow p-4 overflow-y-auto">
           {loading ? (
-            <p>Loading entry...</p>
+            <div className="flex items-center space-x-4">
+              <div className="space-y-2">
+                <Skeleton className="h-4 w-[250px]" />
+                <Skeleton className="h-4 w-[200px]" />
+              </div>
+            </div>
           ) : (
             <Textarea
               className="w-full h-full resize-none"
