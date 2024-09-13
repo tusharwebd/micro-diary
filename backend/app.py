@@ -86,9 +86,14 @@ def save_diary_entry():
 
     if not date or not content:
         return jsonify({"error": "Date and content are required!"}), 400
+    
+    existing_entry = DiaryEntry.query.filter_by(user_id=user_id, date=date).first()
 
-    new_entry = DiaryEntry(user_id=user.id, date=date, content=content)
-    db.session.add(new_entry)
+    if not existing_entry:
+        new_entry = DiaryEntry(user_id=user.id, date=date, content=content)
+        db.session.add(new_entry)
+    else:
+       existing_entry.content = content
     db.session.commit()
 
     return jsonify({"message": "Diary entry saved successfully!"}), 201
