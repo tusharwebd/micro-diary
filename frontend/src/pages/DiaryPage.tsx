@@ -7,6 +7,15 @@ import { UserIcon, SearchIcon, MenuIcon } from "lucide-react";
 import httpClient from "../httpClient";
 import { Link } from "react-router-dom";
 import { Skeleton } from "@/components/ui/skeleton";
+import { CalendarIcon } from "@radix-ui/react-icons";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // Function to generate a list of dates for the past 7 days
 const generatePastWeekDates = () => {
@@ -21,6 +30,11 @@ const generatePastWeekDates = () => {
 };
 
 function DiaryPage() {
+  const todayDate = new Date();
+  const dateFinal = new Date();
+  dateFinal.setDate(todayDate.getDate());
+  const dateString = dateFinal.toISOString().split("T");
+  const [date, setDate] = useState<Date>(todayDate);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(generatePastWeekDates()[0]); // Default to today
   const [content, setContent] = useState<string>("");
@@ -30,7 +44,7 @@ function DiaryPage() {
   const saveEntry = async () => {
     console.log(content);
     const response = await httpClient.post("//localhost:5000/save_entry", {
-      date: selectedDate,
+      date: date.toISOString().split("T")[0],
       content,
     });
     console.log(response.data);
@@ -40,7 +54,7 @@ function DiaryPage() {
     try {
       setLoading(true); // Set loading state to true before fetching
       const response = await httpClient.post("//localhost:5000/get_entry", {
-        date: selectedDate,
+        date: date.toISOString().split("T")[0],
       });
       console.log(response.data);
       setContent(response.data.content || ""); // Set the content if data is available
@@ -54,7 +68,7 @@ function DiaryPage() {
   // Fetch the entry whenever the selected date changes
   useEffect(() => {
     getEntry();
-  }, [selectedDate]);
+  }, [date]);
 
   const logoutUser = async () => {
     const response = await httpClient.post("//localhost:5000/logout");
@@ -107,15 +121,11 @@ function DiaryPage() {
       <div className="flex-grow flex overflow-hidden">
         {/* Left Pane */}
         <div className="w-64 bg-muted p-4 overflow-y-auto hidden md:block">
-          <div className="flex justify-center">
-            <Button onClick={saveEntry}>Save</Button>
-          </div>
-          <br />
           <Separator />
           <h2 className="text-lg font-semibold mb-4">Diary Entries</h2>
 
           {/* Dynamic list of dates */}
-          {dates.map((date, index) => (
+          {/* {dates.map((date, index) => (
             <div key={date}>
               <Button
                 variant={selectedDate === date ? "primary" : "ghost"}
@@ -129,9 +139,37 @@ function DiaryPage() {
                 })}
               </Button>
               {index < dates.length - 1 && <Separator />}{" "}
-              {/* Add a separator between the dates */}
             </div>
-          ))}
+          ))} */}
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant={"outline"}
+                className={cn(
+                  "w-[240px] justify-start text-left font-normal",
+                  !date && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {date ? format(date, "PPP") : <span>Pick a date</span>}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <Calendar
+                mode="single"
+                selected={date}
+                onSelect={setDate}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
+          <Separator />
+          <br></br>
+          <br></br>
+          <div className="flex justify-center">
+            <Button onClick={saveEntry}>Save</Button>
+          </div>
         </div>
 
         {/* Textarea */}
@@ -148,7 +186,7 @@ function DiaryPage() {
               className="w-full h-full resize-none"
               value={content} // Set the value of the textarea to the fetched content
               placeholder={`Start typing your entry for ${new Date(
-                selectedDate
+                date
               ).toLocaleDateString()}`}
               onChange={(e) => setContent(e.target.value)}
             />
