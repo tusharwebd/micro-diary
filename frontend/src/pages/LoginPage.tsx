@@ -1,17 +1,8 @@
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from "@/components/ui/card";
+import { useState } from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
-// import { Link } from "react-router-dom";
 import httpClient from "../httpClient";
 
 function LoginPage() {
@@ -39,89 +30,73 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex flex-row w-screen items-center justify-center bg-background">
-      <Tabs defaultValue="login" className="w-[400px]">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="register">Register</TabsTrigger>
-        </TabsList>
-        <TabsContent value="login">
-          <Card className="w-full max-w-md">
-            <CardHeader className="space-y-1 text-center">
-              <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
-              <CardDescription>
-                Enter your email and password to access your account.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
+    <div className="flex min-h-screen w-screen items-center justify-center bg-stone-500">
+      <div className="grid w-full max-w-5xl grid-cols-3 rounded-xl bg-card shadow-xl">
+        <div className="col-span-2 hidden rounded-l-xl bg-muted lg:block">
+          <img
+            src="./diary.webp"
+            width={800}
+            height={600}
+            alt="Diary"
+            className="h-full w-full object-cover object-center"
+            style={{ aspectRatio: "800/600", objectFit: "cover" }}
+          />
+        </div>
+        <div className="col-span-1 flex flex-col items-center justify-center gap-8 p-8 lg:p-12">
+          <Tabs defaultValue="login" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="login">Login</TabsTrigger>
+              <TabsTrigger value="register">Register</TabsTrigger>
+            </TabsList>
+            <TabsContent value="login">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="m@example.com"
+                    required
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full" onClick={() => logInUser()}>
-                Sign in
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-        <TabsContent value="register">
-          <Card className="w-full max-w-md">
-            <CardHeader className="space-y-1 text-center">
-              <CardTitle className="text-2xl font-bold">Signup!</CardTitle>
-              <CardDescription>
-                Enter your email and password to register your account.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  required
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
+                <div className="space-y-2">
                   <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    required
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
                 </div>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  onChange={(e) => setPassword(e.target.value)}
-                />
+                <Button className="w-full" onClick={() => logInUser()}>
+                  Login
+                </Button>
               </div>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full" onClick={() => registerUser()}>
-                Register
-              </Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-      </Tabs>
+            </TabsContent>
+            <TabsContent value="register">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="m@example.com"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="password">Password</Label>
+                  <Input id="password" type="password" required />
+                </div>
+                <Button className="w-full" onClick={() => registerUser()}>
+                  Register
+                </Button>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
     </div>
   );
 }
